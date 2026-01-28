@@ -22,6 +22,9 @@ export const getAllProducts = async () => {
 };
 
 export const createProduct = async (productData) => {
+  if (productData?.price){
+    productData.price=Number(productData.price)
+  }
   try {
     const response = await api.post('/createproduct', productData);
     return response.data;
