@@ -25,30 +25,21 @@ var productList []Product
 
 // GET API
 func getproducts(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+	handleCors(w)
+	handlePreflight(w, r)
 
 	if r.Method != "GET" {
 		http.Error(w, "plz give me GET request", 400)
 		return
 	}
 
-	encoder := json.NewEncoder(w)
-	encoder.Encode(productList)
+	sendData(w, productList, 200)
 }
 
 // POST API
 func createProduct(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-
-	if r.Method == "OPTIONS" {
-		w.WriteHeader(200)
-		return
-	}
+	handleCors(w)
+	handlePreflight(w, r)
 
 	if r.Method != "POST" {
 		http.Error(w, "plz give me POST request", 400)
@@ -67,10 +58,32 @@ func createProduct(w http.ResponseWriter, r *http.Request) {
 	newProduct.ID = len(productList) + 1
 	productList = append(productList, newProduct)
 
-	w.WriteHeader(201)
+	sendData(w, newProduct, 201)
+
+}
+
+// handling preflight request or options
+func handlePreflight(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "OPTIONS" {
+		w.WriteHeader(200)
+		return
+	}
+}
+
+// Handling CORS means allowing access
+func handleCors(w http.ResponseWriter) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+}
+
+// handling data sending
+func sendData(w http.ResponseWriter, data interface{}, statusCode int) {
+	w.WriteHeader(statusCode)
 
 	encoder := json.NewEncoder(w)
-	encoder.Encode(newProduct)
+	encoder.Encode(data)
 }
 
 func main() {
