@@ -11,7 +11,8 @@ func Serve() {
 	mux := http.NewServeMux()
 
 	mux.Handle("GET /products", http.HandlerFunc(handlers.Getproducts))
-	mux.Handle("POST /createproduct", http.HandlerFunc(handlers.CreateProduct))
+	mux.Handle("POST /products", http.HandlerFunc(handlers.CreateProduct))
+	mux.Handle("GET /products/{productId}", http.HandlerFunc(handlers.Getproductbyid))
 
 	globalrouter := globalRouter.GlobalRouter(mux)
 	fmt.Println("server running on :8080")
